@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二手车过户进度查询</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-inline-block align-text-top me-2">
+                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                    <circle cx="7" cy="17" r="2"></circle>
+                    <path d="M9 17h6"></path>
+                    <circle cx="17" cy="17" r="2"></circle>
+                </svg>
+                二手车过户进度查询
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h4 class="card-title text-center mb-4">请输入您的车架号（VIN）查询过户进度</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" id="vinInput" class="form-control form-control-lg" placeholder="请输入17位车架号" maxlength="17">
+                            <button class="btn btn-primary btn-lg" id="searchBtn" type="button">
+                                <span id="searchBtnText">查询</span>
+                                <span id="searchBtnLoading" class="d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>查询中
+                                </span>
+                            </button>
+                        </div>
+                        <div class="text-center text-muted small">
+                            示例车架号：LBV1Z3108KM000001、LFV3A24F2C3000002、JTEBU5JR3K5000003
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="row justify-content-center mt-4 d-none">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">车辆基本信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">车架号</label>
+                                <div id="vinDisplay" class="fw-bold"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">原车牌号</label>
+                                <div id="plateDisplay" class="fw-bold"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">车型</label>
+                                <div id="modelDisplay"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">转入城市</label>
+                                <div id="cityDisplay"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">买方姓名</label>
+                                <div id="buyerDisplay"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">当前状态</label>
+                                <div><span id="statusBadge" class="badge bg-info fs-6"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">过户进度</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>总进度</span>
+                                <span id="progressPercent" class="fw-bold">0%</span>
+                            </div>
+                            <div class="progress" style="height: 25px;">
+                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div id="progressTimeline" class="timeline mt-4">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">费用明细</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>费用项目</th>
+                                        <th>金额</th>
+                                        <th>支付人</th>
+                                        <th>日期</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenseTable">
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-warning fw-bold">
+                                        <td>合计</td>
+                                        <td id="totalAmount">¥0.00</td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorContainer" class="row justify-content-center mt-4 d-none">
+            <div class="col-lg-8">
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">查询失败</h4>
+                    <p id="errorMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3 bg-light text-center text-muted">
+        <div class="container">
+            <small>北京二手车转出跟踪系统 © 2024</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

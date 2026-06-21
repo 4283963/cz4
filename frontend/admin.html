@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 二手车过户进度跟踪系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-inline-block align-text-top me-2">
+                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                    <circle cx="7" cy="17" r="2"></circle>
+                    <path d="M9 17h6"></path>
+                    <circle cx="17" cy="17" r="2"></circle>
+                </svg>
+                管理后台
+            </span>
+            <a href="/" class="btn btn-outline-light btn-sm">返回查询页面</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3 id="statTotal">0</h3>
+                        <div>总记录数</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <h3 id="statPending">0</h3>
+                        <div>待提档</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 id="statTiDang">0</h3>
+                        <div>提档中</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <h3 id="statLuoHu">0</h3>
+                        <div>落户中</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-orange text-white">
+                    <div class="card-body text-center">
+                        <h3 id="statMaking">0</h3>
+                        <div>制牌中</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 id="statCompleted">0</h3>
+                        <div>已完成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">过户记录列表</h5>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+                    + 新增过户记录
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>车架号</th>
+                                <th>车牌号</th>
+                                <th>车型</th>
+                                <th>买方</th>
+                                <th>转入城市</th>
+                                <th>当前阶段</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transferTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增过户记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">车架号（VIN）*</label>
+                                <input type="text" class="form-control" name="vin" maxlength="17" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">原车牌号 *</label>
+                                <input type="text" class="form-control" name="plate_number" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">车型 *</label>
+                                <input type="text" class="form-control" name="car_model" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">原车主姓名 *</label>
+                                <input type="text" class="form-control" name="owner_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">买方姓名 *</label>
+                                <input type="text" class="form-control" name="buyer_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">买方电话 *</label>
+                                <input type="text" class="form-control" name="buyer_phone" required>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">转入城市 *</label>
+                                <input type="text" class="form-control" name="target_city" placeholder="如：上海市" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="createSubmitBtn">创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="progressModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">更新过户进度</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">车辆信息</label>
+                        <div id="progressCarInfo" class="text-muted"></div>
+                    </div>
+                    <form id="progressForm">
+                        <input type="hidden" name="transfer_id">
+                        <div class="mb-3">
+                            <label class="form-label">当前阶段 *</label>
+                            <select class="form-select" name="stage" id="stageSelect" required>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">经办人 *</label>
+                            <input type="text" class="form-control" name="operator" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-control" name="remark" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="progressSubmitBtn">更新</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="expenseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">费用管理</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">车辆信息</label>
+                        <div id="expenseCarInfo" class="text-muted"></div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">添加费用</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="expenseForm">
+                                <input type="hidden" name="transfer_id">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control form-control-sm" name="item_name" placeholder="费用项目 *" required>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <input type="number" step="0.01" class="form-control form-control-sm" name="amount" placeholder="金额 *" required>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <input type="text" class="form-control form-control-sm" name="payer" placeholder="支付人">
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <input type="date" class="form-control form-control-sm" name="expense_time">
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <button type="button" class="btn btn-primary btn-sm w-100" id="expenseAddBtn">添加</button>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control form-control-sm" name="remark" placeholder="备注">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>费用项目</th>
+                                    <th>金额</th>
+                                    <th>支付人</th>
+                                    <th>日期</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseList">
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-warning fw-bold">
+                                    <td>合计</td>
+                                    <td id="expenseTotal">¥0.00</td>
+                                    <td colspan="4"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">过户详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detailContent">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3 bg-light text-center text-muted">
+        <div class="container">
+            <small>北京二手车转出跟踪系统 © 2024</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

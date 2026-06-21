@@ -87,24 +87,24 @@ async function createTransfer(data) {
     const transferId = result.insertId;
 
     await db.query(
-        `INSERT INTO progress_nodes (transfer_id, stage, stage_name, operator, remark)
-         VALUES (?, 0, ?, ?, ?)`,
+        `INSERT INTO progress_nodes (transfer_id, stage, stage_name, operator, remark, photo_url)
+         VALUES (?, 0, ?, ?, ?, NULL)`,
         [transferId, STAGE_NAMES[0], '系统', '过户记录已创建']
     );
 
     return transferId;
 }
 
-async function updateProgress(transferId, stage, operator, remark) {
+async function updateProgress(transferId, stage, operator, remark, photoUrl = null) {
     const stageName = STAGE_NAMES[stage];
     if (!stageName) {
         throw new Error('无效的阶段值');
     }
 
     await db.query(
-        `INSERT INTO progress_nodes (transfer_id, stage, stage_name, operator, remark)
-         VALUES (?, ?, ?, ?, ?)`,
-        [transferId, stage, stageName, operator, remark]
+        `INSERT INTO progress_nodes (transfer_id, stage, stage_name, operator, remark, photo_url)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [transferId, stage, stageName, operator, remark, photoUrl]
     );
 
     await db.query(

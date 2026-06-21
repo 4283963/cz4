@@ -185,6 +185,43 @@ function openProgressModal(transferId) {
     document.querySelector('#progressForm input[name="operator"]').value = '';
     document.querySelector('#progressForm textarea[name="remark"]').value = '';
 
+    const photoInput = document.getElementById('photoInput');
+    const previewWrap = document.getElementById('photoPreviewWrap');
+    const previewImg = document.getElementById('photoPreview');
+    const clearBtn = document.getElementById('clearPhotoBtn');
+
+    photoInput.value = '';
+    previewWrap.classList.add('d-none');
+    previewImg.src = '';
+
+    if (!photoInput.dataset.bound) {
+        photoInput.addEventListener('change', () => {
+            const file = photoInput.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('图片大小不能超过 5MB', 'warning');
+                    photoInput.value = '';
+                    previewWrap.classList.add('d-none');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    previewWrap.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewWrap.classList.add('d-none');
+            }
+        });
+        clearBtn.addEventListener('click', () => {
+            photoInput.value = '';
+            previewImg.src = '';
+            previewWrap.classList.add('d-none');
+        });
+        photoInput.dataset.bound = '1';
+    }
+
     const modal = new bootstrap.Modal(document.getElementById('progressModal'));
     modal.show();
 }
@@ -209,8 +246,7 @@ async function handleProgressUpdate() {
     try {
         const response = await fetch(`${API_BASE}/transfer/${transferId}/progress`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ stage, operator, remark })
+            body: formData
         });
         const result = await response.json();
 

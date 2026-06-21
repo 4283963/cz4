@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const node = progress.find(p => p.stage === item.stage);
             const isCompleted = item.stage <= currentStatus;
             const isCurrent = item.stage === currentStatus;
+            const hasPhoto = node && node.photo_url;
 
             const itemDiv = document.createElement('div');
             itemDiv.className = 'timeline-item';
@@ -155,10 +156,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 borderClass = 'border-success';
             }
 
+            const photoHtml = hasPhoto
+                ? `<div class="mt-2">
+                    <a href="javascript:void(0)" class="photo-trigger d-inline-block position-relative text-decoration-none" data-photo="${node.photo_url}" data-title="${item.name} - 现场照片">
+                        <img src="${node.photo_url}" class="img-thumbnail photo-thumb" alt="点击查看大图" style="max-height:80px; cursor: pointer;">
+                        <span class="position-absolute top-0 start-100 translate-middle badge bg-primary rounded-pill" style="z-index:2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </span>
+                    </a>
+                    <div class="text-muted small mt-1">点击图片查看大图</div>
+                   </div>`
+                : '';
+
             itemDiv.innerHTML = `
                 <div class="timeline-content ${borderClass}">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="mb-1 ${isCompleted ? 'text-dark' : 'text-muted'}">
                                 ${isCurrent ? '<span class="badge bg-primary me-2">当前</span>' : ''}
                                 ${item.name}
@@ -167,8 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="text-muted small">
                                 <span>经办人: ${operatorStr}</span>
                             </div>
+                            ${photoHtml}
                         </div>
-                        <div class="text-end">
+                        <div class="text-end ms-3">
                             <small class="text-muted">${timeStr}</small>
                         </div>
                     </div>
@@ -178,6 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             timeline.appendChild(itemDiv);
+        });
+
+        document.querySelectorAll('.photo-trigger').forEach((el) => {
+            el.addEventListener('click', () => {
+                const photoUrl = el.dataset.photo;
+                const photoTitle = el.dataset.title;
+                document.getElementById('photoModalTitle').textContent = photoTitle;
+                document.getElementById('photoModalImg').src = photoUrl;
+                const modal = new bootstrap.Modal(document.getElementById('photoModal'));
+                modal.show();
+            });
         });
     }
 

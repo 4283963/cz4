@@ -167,7 +167,7 @@
                         <label class="form-label">车辆信息</label>
                         <div id="progressCarInfo" class="text-muted"></div>
                     </div>
-                    <form id="progressForm">
+                    <form id="progressForm" enctype="multipart/form-data">
                         <input type="hidden" name="transfer_id">
                         <div class="mb-3">
                             <label class="form-label">当前阶段 *</label>
@@ -181,6 +181,16 @@
                         <div class="mb-3">
                             <label class="form-label">备注</label>
                             <textarea class="form-control" name="remark" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">现场照片（可选，支持 JPG/PNG/GIF/WebP，≤ 5MB）</label>
+                            <input type="file" class="form-control form-control-sm" name="photo" id="photoInput" accept="image/jpeg,image/png,image/gif,image/webp,image/bmp">
+                            <div id="photoPreviewWrap" class="mt-2 d-none">
+                                <div class="position-relative d-inline-block">
+                                    <img id="photoPreview" class="img-thumbnail" style="max-height: 150px;">
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" id="clearPhotoBtn" title="移除图片">×</button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

@@ -28,6 +28,7 @@ CREATE TABLE progress_nodes (
     stage_name VARCHAR(50) NOT NULL COMMENT '阶段名称',
     operator VARCHAR(50) COMMENT '经办人',
     remark VARCHAR(500) COMMENT '备注',
+    photo_url VARCHAR(500) COMMENT '现场照片URL',
     node_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (transfer_id) REFERENCES transfers(id) ON DELETE CASCADE,
     INDEX idx_transfer (transfer_id),

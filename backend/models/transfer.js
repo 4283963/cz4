@@ -58,9 +58,12 @@ async function getTransferDetail(vin) {
     const transfer = await findByVin(vin);
     if (!transfer) return null;
 
-    const progress = await getProgressNodes(transfer.id);
-    const expenses = await getExpenses(transfer.id);
-    const totalAmount = await getTotalExpense(transfer.id);
+    const [progress, expenses] = await Promise.all([
+        getProgressNodes(transfer.id),
+        getExpenses(transfer.id)
+    ]);
+
+    const totalAmount = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
 
     return {
         transfer,
@@ -127,21 +130,31 @@ async function deleteExpense(expenseId) {
 }
 
 async function getStats() {
-    const total = await db.query('SELECT COUNT(*) as count FROM transfers');
-    const status0 = await db.query('SELECT COUNT(*) as count FROM transfers WHERE status = 0');
-    const status1 = await db.query('SELECT COUNT(*) as count FROM transfers WHERE status = 1');
-    const status2 = await db.query('SELECT COUNT(*) as count FROM transfers WHERE status = 2');
-    const status3 = await db.query('SELECT COUNT(*) as count FROM transfers WHERE status = 3');
-    const status4 = await db.query('SELECT COUNT(*) as count FROM transfers WHERE status = 4');
+    const rows = await db.query(
+        'SELECT status, COUNT(*) as count FROM transfers GROUP BY status'
+    );
 
-    return {
-        total: total[0].count,
-        pending: status0[0].count,
-        tiDang: status1[0].count,
-        luoHu: status2[0].count,
-        makingPlate: status3[0].count,
-        completed: status4[0].count
+    const stats = {
+        total: 0,
+        pending: 0,
+        tiDang: 0,
+        luoHu: 0,
+        makingPlate: 0,
+        completed: 0
     };
+
+    rows.forEach(row => {
+        stats.total += row.count;
+        switch (row.status) {
+            case 0: stats.pending = row.count; break;
+            case 1: stats.tiDang = row.count; break;
+            case 2: stats.luoHu = row.count; break;
+            case 3: stats.makingPlate = row.count; break;
+            case 4: stats.completed = row.count; break;
+        }
+    });
+
+    return stats;
 }
 
 module.exports = {
